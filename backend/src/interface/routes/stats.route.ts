@@ -1,14 +1,12 @@
-import { Router } from 'express';
-import { authMiddleware } from '../middlewares/authMiddleware';
-import { requireRole } from '../middlewares/requireRole';
-import { Role } from '../../shared/lib/roles';
-import { asyncWrapper } from '../../shared/utils/asyncWrapper';
-import { statsController as controller } from '../../config/container';
+import { Router } from "express";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { requireRole } from "../middlewares/requireRole";
+import { Role } from "../../shared/lib/roles";
+import { asyncWrapper } from "../../shared/utils/asyncWrapper";
+import { statsController as controller } from "../../config/container";
 
 const router = Router();
 
-
-export default router;
 /**
  * @swagger
  * components:
@@ -75,7 +73,10 @@ export default router;
  *           type: integer
  *         appointmentsThisWeek:
  *           type: integer
- *
+ */
+
+/**
+ * @swagger
  * /stats:
  *   get:
  *     tags: [Stats]
@@ -103,7 +104,15 @@ export default router;
  *         description: Unauthorized
  *       403:
  *         description: Forbidden
- *
+ */
+router.get(
+  "/",
+  authMiddleware,
+  asyncWrapper(controller.getStats.bind(controller)),
+);
+
+/**
+ * @swagger
  * /stats/patients-per-day:
  *   get:
  *     tags: [Stats]
@@ -129,7 +138,15 @@ export default router;
  *                 error:
  *                   nullable: true
  *                   type: object
- *
+ */
+router.get(
+  "/patients-per-day",
+  authMiddleware,
+  asyncWrapper(controller.getPatientsPerDay.bind(controller)),
+);
+
+/**
+ * @swagger
  * /stats/appointments-per-day:
  *   get:
  *     tags: [Stats]
@@ -155,7 +172,15 @@ export default router;
  *                 error:
  *                   nullable: true
  *                   type: object
- *
+ */
+router.get(
+  "/appointments-per-day",
+  authMiddleware,
+  asyncWrapper(controller.getAppointmentsPerDay.bind(controller)),
+);
+
+/**
+ * @swagger
  * /stats/summary:
  *   get:
  *     tags: [Stats]
@@ -180,7 +205,10 @@ export default router;
  *                   nullable: true
  *                   type: object
  */
-router.get('/', authMiddleware, asyncWrapper(controller.getStats.bind(controller)));
-router.get('/patients-per-day', authMiddleware, asyncWrapper(controller.getPatientsPerDay.bind(controller)));
-router.get('/appointments-per-day', authMiddleware, asyncWrapper(controller.getAppointmentsPerDay.bind(controller)));
-router.get('/summary', authMiddleware, asyncWrapper(controller.getSummary.bind(controller)));
+router.get(
+  "/summary",
+  authMiddleware,
+  asyncWrapper(controller.getSummary.bind(controller)),
+);
+
+export default router;

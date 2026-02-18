@@ -1,1 +1,0 @@
-export { PrescriptionsPage } from "./PrescriptionsPage";

@@ -117,12 +117,11 @@ const router = Router();
  *     security:
  *       - bearerAuth: []
  *     requestBody:
- *       - in: query
- *         name: roomId
- *         schema:
- *           type: string
- *           format: uuid
- *         description: Filter by room id (UUID)
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateMachineDto'
  *     responses:
  *       201:
  *         description: Machine created successfully
@@ -133,6 +132,11 @@ const router = Router();
  *       400:
  *         description: Validation error
  */
+router.post(
+  "/",
+  authMiddleware,
+  asyncWrapper(machineController.createMachine.bind(machineController)),
+);
 
 /**
  * @swagger
@@ -173,109 +177,30 @@ const router = Router();
  *                 error:
  *                   nullable: true
  */
-
-/**
- * @swagger
- * /machines/{id}:
- *   get:
- *     tags: [Machines]
- *     summary: Get machine by id
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     responses:
- *       200:
- *         description: Machine found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/MachineResponse'
- *       404:
- *         description: Machine not found
- */
-
-/**
- * @swagger
- * /machines/{id}:
- *   put:
- *     tags: [Machines]
- *     summary: Update a machine
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateMachineDto'
- *     responses:
- *       200:
- *         description: Machine updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/MachineResponse'
- *       400:
- *         description: Validation error
- *       404:
- *         description: Machine not found
- */
-
-/**
- * @swagger
- * /machines/{id}/deactivate:
- *   patch:
- *     tags: [Machines]
- *     summary: Deactivate a machine (mark as out-of-service)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     responses:
- *       200:
- *         description: Machine deactivated successfully
- *       404:
- *         description: Machine not found
- */
-/** Create machine */
-router.post(
-  "/",
-  authMiddleware,
-  asyncWrapper(machineController.createMachine.bind(machineController))
-);
-
-/** Get all machines */
 router.get(
   "/",
   authMiddleware,
   requireRole([Role.ADMIN, Role.DOCTOR, Role.RECEPTIONIST]),
-  asyncWrapper(machineController.getMachines.bind(machineController))
+  asyncWrapper(machineController.getMachines.bind(machineController)),
 );
 
-/** Get machines stats */
+/**
+ * @swagger
+ * /machines/stats:
+ *   get:
+ *     tags: [Machines]
+ *     summary: Get overall machine statistics
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Machine statistics retrieved
+ */
 router.get(
   "/stats",
   authMiddleware,
   requireRole([Role.ADMIN, Role.DOCTOR, Role.RECEPTIONIST]),
-  asyncWrapper(machineController.getStats.bind(machineController))
+  asyncWrapper(machineController.getStats.bind(machineController)),
 );
 
 /**
@@ -303,42 +228,103 @@ router.get(
  *                 error:
  *                   nullable: true
  *                   type: object
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - Admin/Doctor/Receptionist
  */
-/** Get machine stats (formatted keys) */
 router.get(
   "/machine-stats",
   authMiddleware,
   requireRole([Role.ADMIN, Role.DOCTOR, Role.RECEPTIONIST]),
-  asyncWrapper(machineController.getFormattedStats.bind(machineController))
+  asyncWrapper(machineController.getFormattedStats.bind(machineController)),
 );
 
-/** Get machine by id */
+/**
+ * @swagger
+ * /machines/{id}:
+ *   get:
+ *     tags: [Machines]
+ *     summary: Get machine by id
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Machine found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MachineResponse'
+ *       404:
+ *         description: Machine not found
+ */
 router.get(
   "/:id",
   authMiddleware,
   requireRole([Role.ADMIN, Role.DOCTOR, Role.RECEPTIONIST]),
-  asyncWrapper(machineController.getMachineById.bind(machineController))
+  asyncWrapper(machineController.getMachineById.bind(machineController)),
 );
 
-/** Update machine */
+/**
+ * @swagger
+ * /machines/{id}:
+ *   put:
+ *     tags: [Machines]
+ *     summary: Update a machine
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateMachineDto'
+ *     responses:
+ *       200:
+ *         description: Machine updated successfully
+ */
 router.put(
   "/:id",
   authMiddleware,
   requireRole([Role.ADMIN]),
   validate(updateMachineSchemaDto),
-  asyncWrapper(machineController.updateMachine.bind(machineController))
+  asyncWrapper(machineController.updateMachine.bind(machineController)),
 );
 
-/** Deactivate machine */
+/**
+ * @swagger
+ * /machines/{id}/deactivate:
+ *   patch:
+ *     tags: [Machines]
+ *     summary: Deactivate a machine (mark as out-of-service)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Machine deactivated successfully
+ */
 router.patch(
   "/:id/deactivate",
   authMiddleware,
   requireRole([Role.ADMIN]),
-  asyncWrapper(machineController.deactivateMachine.bind(machineController))
+  asyncWrapper(machineController.deactivateMachine.bind(machineController)),
 );
 
 export default router;
