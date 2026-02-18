@@ -56,7 +56,7 @@ const router = Router();
  *         updatedAt:
  *           type: string
  *           format: date-time
-
+ *
  *     CreateAppointmentRequest:
  *       type: object
  *       required:
@@ -91,6 +91,7 @@ const router = Router();
  *           type: string
  *           format: uuid
  *           nullable: true
+ *
  *     AppointmentHistory:
  *       type: object
  *       properties:
@@ -113,12 +114,14 @@ const router = Router();
  *           type: string
  *           format: date-time
  *           description: When the history was last updated
+ *
  *     UpdateAppointmentHistoryRequest:
  *       type: object
  *       properties:
  *         appointmentData:
  *           type: object
  *           description: Updated appointment data
+ *
  *     AppointmentDetail:
  *       type: object
  *       properties:
