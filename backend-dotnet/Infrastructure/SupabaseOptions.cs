@@ -1,0 +1,8 @@
+namespace ClinicBackend.Api.Infrastructure;
+
+public sealed class SupabaseOptions
+{
+    public string Url { get; set; } = string.Empty;
+    public string PublishableDefaultKey { get; set; } = string.Empty;
+    public string ServiceKey { get; set; } = string.Empty;
+}
